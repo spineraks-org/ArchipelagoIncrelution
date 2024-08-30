@@ -83,8 +83,8 @@ class IncrelutionWorld(World):
             if loc_data.region == board.name and loc_data.chapter <= self.last_chapter]
         
         # Add the victory item to the correct location.
-        # The website declares that the game is complete when the victory item is obtained.
-        victory_location_name = f"Fight octopus"
+        victory_location_name = max((loc for loc in loc_info if loc['chapter'] <= self.last_chapter), key=lambda x: x['id'])['name']
+
         self.get_location(victory_location_name).place_locked_item(self.create_item("Victory"))
 
         # add the regions

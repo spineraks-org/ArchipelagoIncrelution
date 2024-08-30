@@ -10,7 +10,7 @@ class LastChapter(Range):
 
     display_name = "Last chapter"
     range_start = 2
-    range_end = 2
+    range_end = 11
     default = 2
 
 @dataclass
