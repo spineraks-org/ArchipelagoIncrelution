@@ -60,7 +60,7 @@ class IncrelutionWorld(World):
         for construction in constructions:
             if job["chapter"] <= self.last_chapter:
                 self.itempool.append(f"Progressive {job['skill']} Construction")
-        self.itempool += ["Filler"] * (self.number_of_locations - len(self.itempool) - 1)       
+        self.itempool += ["Filler"] * (self.number_of_locations - len(self.itempool) - 2)       
         
 
     def create_items(self):        
@@ -85,6 +85,8 @@ class IncrelutionWorld(World):
         # Add the victory item to the correct location.
         victory_location_name = max((loc for loc in loc_info if loc['chapter'] <= self.last_chapter), key=lambda x: x['id'])['name']
 
+        self.get_location("Explore the area").place_locked_item(self.create_item("Progressive Farming Job"))
+        self.get_location("Explore the cave").place_locked_item(self.create_item("Progressive Construction Construction"))
         self.get_location(victory_location_name).place_locked_item(self.create_item("Victory"))
 
         # add the regions
@@ -113,3 +115,17 @@ class IncrelutionWorld(World):
         item_data = item_table[name]
         item = IncrelutionItem(name, item_data.classification, item_data.code, self.player)
         return item
+    
+    def generate_output(self, output_directory: str) -> None:
+        counts = {}
+        for job in jobs:
+            if job["skill"] not in counts:
+                counts[job["skill"]] = 0
+            counts[job["skill"]] += 1
+            print(f"if(item == 'Progressive {job['skill']} Job' && counts[item] == {counts[job['skill']]}){{a0_0x3feeba[{job['id_in_game']}]['shouldShow'] = window.oldJob[{job['id_in_game']}];}}")
+        counts = {}
+        for construction in constructions:
+            if construction["skill"] not in counts:
+                counts[construction["skill"]] = 0
+            counts[construction["skill"]] += 1
+            print(f"if(item == 'Progressive {construction['skill']} Construction' && counts[item] == {counts[construction['skill']]}){{a0_0x81eb24[{construction['id_in_game']}]['shouldShow'] = window.oldCon[{construction['id_in_game']}];}}")
