@@ -1,7 +1,7 @@
 constructions = [
     {"name": "Wooden cart", "id_in_game": 0, "chapter": 0, "skill": "Carts"},
     {"name": "Wooden hut", "id_in_game": 1, "chapter": 0, "skill": "Huts"},
-    {"name": "Campfire", "id_in_game": 2, "chapter": 1.1, "skill": "Construction"},
+    {"name": "Campfire", "id_in_game": 2, "chapter": 0, "skill": "Construction"},
     {"name": "Stone cart", "id_in_game": 3, "chapter": 1.2, "skill": "Carts"},
     {"name": "Stone hut", "id_in_game": 4, "chapter": 1.2, "skill": "Huts"},
     {"name": "Bridge", "id_in_game": 5, "chapter": 1.3, "skill": "Progression"},
