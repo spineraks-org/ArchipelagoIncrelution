@@ -6,10 +6,12 @@ from BaseClasses import CollectionState, Entrance, Item, Region, Tutorial
 from worlds.AutoWorld import WebWorld, World
 
 from .Items import IncrelutionItem, item_table
-from .Locations import location_table, IncrelutionLocation, loc_info
+from .Locations import location_table, IncrelutionLocation
 from .Options import IncrelutionOptions
 from .Rules import set_increlution_rules, set_increlution_completion
-from .Unlocks import jobs, constructions
+from .info_jobs import jobs
+from .info_constructions import constructions
+from .info_locations import loc_info
 
 
 class IncrelutionWeb(WebWorld):
@@ -52,22 +54,35 @@ class IncrelutionWorld(World):
         In generate early, we fill the item-pool, then determine the number of locations, and add filler items.
         """
         self.itempool = []
-        self.last_chapter = self.options.last_chapter.value
+        self.last_chapter = self.options.last_chapter.value + 0.99
         self.number_of_locations = len([expl for expl in loc_info if expl["chapter"] <= self.last_chapter])
-        for job in jobs:
+        for job_name, job in jobs.items():
             if job["chapter"] <= self.last_chapter:
-                self.itempool.append(f"Progressive {job['skill']} Job")
-        for construction in constructions:
-            if job["chapter"] <= self.last_chapter:
-                self.itempool.append(f"Progressive {job['skill']} Construction")
-        self.itempool += ["Filler"] * (self.number_of_locations - len(self.itempool) - 2)       
+                if job['skill'] == "Cooking" or job['chapter'] == 0:
+                    self.multiworld.push_precollected(self.create_item(f"Progressive {job['skill']} Job"))
+                else:
+                    self.itempool.append(f"Progressive {job['skill']} Job")
+        for c_name, construction in constructions.items():
+            if construction["chapter"] <= self.last_chapter:
+                if construction['chapter'] == 0:
+                    self.multiworld.push_precollected(self.create_item(f"Progressive {construction['skill']} Construction"))
+                else:
+                    self.itempool.append(f"Progressive {construction['skill']} Construction")
+                    
+        
+        
+        # print(f"precollected: {self.multiworld.precollected_items}")     
+        # print(f"locations: {[expl for expl in loc_info if expl['chapter'] <= self.last_chapter]}")
+        # print(f"itempool: {self.itempool}")
+        # print(f"#fillers: {self.number_of_locations - len(self.itempool) - 1}")
+        self.itempool += ["Filler"] * (self.number_of_locations - len(self.itempool) - 1)
         
 
     def create_items(self):        
         self.multiworld.itempool += [self.create_item(name) for name in self.itempool]
+        print("itempool", len(self.multiworld.itempool))
 
     def create_regions(self):
-        # call the ini_locations function, that generates locations based on the inputs.
         # simple menu-board construction
         menu = Region("Menu", self.player, self.multiworld)
         board = Region("Board", self.player, self.multiworld)
@@ -78,16 +93,16 @@ class IncrelutionWorld(World):
             if loc_data.region == board.name and loc_data.chapter <= self.last_chapter
         ]
         
-        locs = [f"{loc_name} {loc_data.chapter}"
-            for loc_name, loc_data in location_table.items()
-            if loc_data.region == board.name and loc_data.chapter <= self.last_chapter]
-        
         # Add the victory item to the correct location.
         victory_location_name = max((loc for loc in loc_info if loc['chapter'] <= self.last_chapter), key=lambda x: x['id'])['name']
 
-        self.get_location("Explore the area").place_locked_item(self.create_item("Progressive Farming Job"))
-        self.get_location("Explore the cave").place_locked_item(self.create_item("Progressive Construction Construction"))
+        # self.get_location("Explore the area").place_locked_item(self.create_item("Progressive Farming Job"))
+        # self.get_location("Explore the cave").place_locked_item(self.create_item("Progressive Woodcutting Job"))
+        # self.get_location("Fight cave spider").place_locked_item(self.create_item("Progressive Digging Job"))
+        # self.get_location("Explore cave exit").place_locked_item(self.create_item("Progressive Progression Construction"))
         self.get_location(victory_location_name).place_locked_item(self.create_item("Victory"))
+        
+        print("locations", len(self.multiworld.get_locations(self.player)))
 
         # add the regions
         connection = Entrance(self.player, "New Board", menu)
@@ -116,16 +131,16 @@ class IncrelutionWorld(World):
         item = IncrelutionItem(name, item_data.classification, item_data.code, self.player)
         return item
     
-    def generate_output(self, output_directory: str) -> None:
-        counts = {}
-        for job in jobs:
-            if job["skill"] not in counts:
-                counts[job["skill"]] = 0
-            counts[job["skill"]] += 1
-            print(f"if(item == 'Progressive {job['skill']} Job' && counts[item] == {counts[job['skill']]}){{a0_0x3feeba[{job['id_in_game']}]['shouldShow'] = window.oldJob[{job['id_in_game']}];}}")
-        counts = {}
-        for construction in constructions:
-            if construction["skill"] not in counts:
-                counts[construction["skill"]] = 0
-            counts[construction["skill"]] += 1
-            print(f"if(item == 'Progressive {construction['skill']} Construction' && counts[item] == {counts[construction['skill']]}){{a0_0x81eb24[{construction['id_in_game']}]['shouldShow'] = window.oldCon[{construction['id_in_game']}];}}")
+    # def generate_output(self, output_directory: str) -> None:
+    #     counts = {}
+    #     for job_name, job in jobs.items():
+    #         if job["skill"] not in counts:
+    #             counts[job["skill"]] = 0
+    #         counts[job["skill"]] += 1
+    #         print(f"if(item == 'Progressive {job['skill']} Job' && counts[item] == {counts[job['skill']]}){{a0_0x3feeba[{job['id_in_game']}]['shouldShow'] = window.oldJob[{job['id_in_game']}];}}")
+    #     counts = {}
+    #     for con_name, construction in constructions.items():
+    #         if construction["skill"] not in counts:
+    #             counts[construction["skill"]] = 0
+    #         counts[construction["skill"]] += 1
+    #         print(f"if(item == 'Progressive {construction['skill']} Construction' && counts[item] == {counts[construction['skill']]}){{a0_0x81eb24[{construction['id_in_game']}]['shouldShow'] = window.oldCon[{construction['id_in_game']}];}}")
