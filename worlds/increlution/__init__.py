@@ -7,7 +7,7 @@ from worlds.AutoWorld import WebWorld, World
 
 from .Items import IncrelutionItem, item_table
 from .Locations import location_table, IncrelutionLocation
-from .Options import IncrelutionOptions
+from .Options import IncrelutionOptions, LogicStyle
 from .Rules import set_increlution_rules, set_increlution_completion
 from .info_jobs import jobs
 from .info_constructions import constructions
@@ -53,12 +53,22 @@ class IncrelutionWorld(World):
         """
         In generate early, we fill the item-pool, then determine the number of locations, and add filler items.
         """
+        
+        
+        self.logic_type = -1
+        if(self.options.logic_style == LogicStyle.option_free):
+            self.logic_type = 1
+        if(self.options.logic_style == LogicStyle.option_jobs):
+            self.logic_type = 2
+        if(self.options.logic_style == LogicStyle.option_full):
+            self.logic_type = 3
+        
         self.itempool = []
         self.last_chapter = self.options.last_chapter.value + 0.99
         self.number_of_locations = len([expl for expl in loc_info if expl["chapter"] <= self.last_chapter])
         for job_name, job in jobs.items():
             if job["chapter"] <= self.last_chapter:
-                if job['skill'] == "Cooking" or job['chapter'] == 0:
+                if job['skill'] == "Cooking":
                     self.multiworld.push_precollected(self.create_item(f"Progressive {job['skill']} Job"))
                 else:
                     self.itempool.append(f"Progressive {job['skill']} Job")
@@ -69,13 +79,34 @@ class IncrelutionWorld(World):
                 else:
                     self.itempool.append(f"Progressive {construction['skill']} Construction")
                     
+        if self.logic_type >= 2:
+            self.multiworld.push_precollected(self.create_item("Progressive Farming Job"))
+            self.itempool.remove("Progressive Farming Job")
+            self.multiworld.push_precollected(self.create_item("Progressive Woodcutting Job"))
+            self.itempool.remove("Progressive Woodcutting Job")
+            self.multiworld.push_precollected(self.create_item("Progressive Construction Construction"))
+            self.itempool.remove("Progressive Construction Construction")
+        if self.logic_type >= 3:
+            self.multiworld.push_precollected(self.create_item("Progressive Farming Job"))
+            self.itempool.remove("Progressive Farming Job")
+            self.multiworld.push_precollected(self.create_item("Progressive Digging Job"))
+            self.itempool.remove("Progressive Digging Job")
+            self.multiworld.push_precollected(self.create_item("Progressive Fishing Job"))
+            self.itempool.remove("Progressive Fishing Job")
+            self.multiworld.push_precollected(self.create_item("Progressive Huts Construction"))
+            self.itempool.remove("Progressive Huts Construction")
+            self.multiworld.push_precollected(self.create_item("Progressive Carts Construction"))
+            self.itempool.remove("Progressive Carts Construction")
+            self.multiworld.push_precollected(self.create_item("Progressive Progression Construction"))
+            self.itempool.remove("Progressive Progression Construction")
+            
+        perk_names = ["Perk: Generation exp. req.", "Perk: Instinct exp. req.", "Perk: Base decay", "Perk: Decay growth/min", "Perk: Max health gain",
+              "Perk: Food cooldown", "Perk: Food value", "Perk: Combat shield", "Perk: Completion damage", "Perk: Passive jobs"]
         
-        
-        # print(f"precollected: {self.multiworld.precollected_items}")     
-        # print(f"locations: {[expl for expl in loc_info if expl['chapter'] <= self.last_chapter]}")
-        # print(f"itempool: {self.itempool}")
-        # print(f"#fillers: {self.number_of_locations - len(self.itempool) - 1}")
-        self.itempool += ["Filler"] * (self.number_of_locations - len(self.itempool) - 1)
+        for i in range(self.number_of_locations - len(self.itempool) - 1):
+            self.itempool.append(perk_names[i%10])
+        # for i in range(10):
+        #     print(f"if(item == '{perk_names[i]}'){{game[a0_0x3f84('0x101')]['perks'][{i}]['mantissa'] = counts[item];logtext += 'Received {perk_names[i]}\\n'}}")
         
 
     def create_items(self):        
@@ -115,7 +146,8 @@ class IncrelutionWorld(World):
         """
         set rules per location, and add the rule for beating the game
         """
-        set_increlution_rules(self.multiworld, self.player)
+            
+        set_increlution_rules(self.multiworld, self.player, self.logic_type)
         set_increlution_completion(self.multiworld, self.player)
 
     def fill_slot_data(self):
@@ -137,10 +169,12 @@ class IncrelutionWorld(World):
     #         if job["skill"] not in counts:
     #             counts[job["skill"]] = 0
     #         counts[job["skill"]] += 1
-    #         print(f"if(item == 'Progressive {job['skill']} Job' && counts[item] == {counts[job['skill']]}){{a0_0x3feeba[{job['id_in_game']}]['shouldShow'] = window.oldJob[{job['id_in_game']}];}}")
+    #         print(f"if(item == 'Progressive {job['skill']} Job' && counts[item] == {counts[job['skill']]}){{a0_0x3feeba[{job['id_in_game']}]['shouldShow'] = window.oldJob[{job['id_in_game']}];logtext += 'Received job {job_name}\\n'}}")
     #     counts = {}
     #     for con_name, construction in constructions.items():
     #         if construction["skill"] not in counts:
     #             counts[construction["skill"]] = 0
     #         counts[construction["skill"]] += 1
-    #         print(f"if(item == 'Progressive {construction['skill']} Construction' && counts[item] == {counts[construction['skill']]}){{a0_0x81eb24[{construction['id_in_game']}]['shouldShow'] = window.oldCon[{construction['id_in_game']}];}}")
+    #         print(f"if(item == 'Progressive {construction['skill']} Construction' && counts[item] == {counts[construction['skill']]}){{a0_0x81eb24[{construction['id_in_game']}]['shouldShow'] = window.oldCon[{construction['id_in_game']}];logtext += 'Received construction {con_name}\\n'}}")
+
+

@@ -5,20 +5,13 @@ from .info_jobs import jobs
 from .info_constructions import constructions
 
 
-def set_increlution_rules(world: MultiWorld, player: int):
+def set_increlution_rules(world: MultiWorld, player: int, logic_style: int):
 
     for location in world.get_locations(player):
         required_items = location_logic[location.name]
         required_items = [item for item in required_items if item]
         
         required_unlocks = []
-        
-        for item in jobs:
-            if(jobs[item]["chapter"] <= locations[location.name]["chapter"]):
-                skill = jobs[item]["skill"]
-                id = jobs[item]["id_in_game"]
-                required_unlocks.append((f"Progressive {skill} Job", len([j for j in jobs.values() if j["skill"] == skill and j["id_in_game"] <= id])))
-        
         
         for item in required_items:
             if item in jobs:
@@ -32,6 +25,20 @@ def set_increlution_rules(world: MultiWorld, player: int):
             else:
                 raise LookupError(f"Couldn't find item in jobs or constructions, {item}")
             
+        if logic_style > 1:
+            for item in jobs:
+                if(jobs[item]["chapter"] <= locations[location.name]["chapter"]):
+                    skill = jobs[item]["skill"]
+                    id = jobs[item]["id_in_game"]
+                    required_unlocks.append((f"Progressive {skill} Job", len([j for j in jobs.values() if j["skill"] == skill and j["id_in_game"] <= id])))
+            
+        if logic_style > 2:
+            for item in constructions:
+                        if(constructions[item]["chapter"] <= locations[location.name]["chapter"]):
+                            skill = constructions[item]["skill"]
+                            id = constructions[item]["id_in_game"]
+                            required_unlocks.append((f"Progressive {skill} Construction", len([j for j in constructions.values() if j["skill"] == skill and j["id_in_game"] <= id])))
+            
         # Dictionary to store the highest value for each job
         job_dict = {}
 
@@ -41,12 +48,9 @@ def set_increlution_rules(world: MultiWorld, player: int):
                 job_dict[job] = number
 
         # Convert the dictionary back to a list of tuples
-        filtered_list = list(job_dict.items())
-
-        # Calculate the sum of the numbers
-        total_sum = sum(job_dict.values())
-            
-        # print(f"{location} needs {filtered_list} total {total_sum}")
+        required_unlocks = list(job_dict.items())
+        
+        print(f"{location} need {required_unlocks}")
                 
         location.access_rule = lambda state, player=player, required_unlocks=required_unlocks: all(state.has(s, player, a) for (s, a) in required_unlocks)
 

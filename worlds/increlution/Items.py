@@ -25,6 +25,17 @@ item_table = {
     "Progressive Construction Construction": ItemData(23, ItemClassification.progression),
     "Progressive Progression Construction": ItemData(24, ItemClassification.progression),
     "Progressive Skill Item Construction": ItemData(25, ItemClassification.progression),
+    "Perk: Generation exp. req.": ItemData(101, ItemClassification.useful),
+    "Perk: Instinct exp. req.": ItemData(102, ItemClassification.useful),
+    "Perk: Base decay": ItemData(103, ItemClassification.useful),
+    "Perk: Decay growth/min": ItemData(104, ItemClassification.useful),
+    "Perk: Max health gain": ItemData(105, ItemClassification.useful),
+    "Perk: Food cooldown": ItemData(106, ItemClassification.useful),
+    "Perk: Food value": ItemData(107, ItemClassification.useful),
+    "Perk: Combat shield": ItemData(108, ItemClassification.useful),
+    "Perk: Completion damage": ItemData(109, ItemClassification.useful),
+    "Perk: Passive jobs": ItemData(110, ItemClassification.useful),
     "Victory": ItemData(2345678, ItemClassification.progression),
     "Filler": ItemData(2389423, ItemClassification.filler),
 }
+
