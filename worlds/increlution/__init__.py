@@ -46,7 +46,7 @@ class IncrelutionWorld(World):
 
     location_name_to_id = {name: data.id for name, data in location_table.items()}
 
-    ap_world_version = "0.0.2"
+    ap_world_version = "0.1.0"
 
 
     def generate_early(self):
@@ -103,8 +103,15 @@ class IncrelutionWorld(World):
         perk_names = ["Perk: Generation exp. req.", "Perk: Instinct exp. req.", "Perk: Base decay", "Perk: Decay growth/min", "Perk: Max health gain",
               "Perk: Food cooldown", "Perk: Food value", "Perk: Combat shield", "Perk: Completion damage", "Perk: Passive jobs"]
         
-        for i in range(self.number_of_locations - len(self.itempool) - 1):
+        for i in range(self.options.perks_to_start_with.value):
+            for p in perk_names:
+                self.multiworld.push_precollected(self.create_item(p))
+                
+        for i in range(max(self.options.perks_in_itempool.value * 10, self.number_of_locations - len(self.itempool) - 1)):
             self.itempool.append(perk_names[i%10])
+            
+        if self.number_of_locations - len(self.itempool) - 1 > 0:
+            self.itempool += ["Filler"] * (self.number_of_locations - len(self.itempool) - 1)
         # for i in range(10):
         #     print(f"if(item == '{perk_names[i]}'){{game[a0_0x3f84('0x101')]['perks'][{i}]['mantissa'] = counts[item];logtext += 'Received {perk_names[i]}\\n'}}")
         
