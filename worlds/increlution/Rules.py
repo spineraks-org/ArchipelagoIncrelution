@@ -50,7 +50,7 @@ def set_increlution_rules(world: MultiWorld, player: int, logic_style: int):
         # Convert the dictionary back to a list of tuples
         required_unlocks = list(job_dict.items())
         
-        print(f"{location} need {required_unlocks}")
+        # print(f"{location} need {required_unlocks}")
                 
         location.access_rule = lambda state, player=player, required_unlocks=required_unlocks: all(state.has(s, player, a) for (s, a) in required_unlocks)
 

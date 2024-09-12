@@ -7,7 +7,7 @@ from worlds.AutoWorld import WebWorld, World
 
 from .Items import IncrelutionItem, item_table
 from .Locations import location_table, IncrelutionLocation
-from .Options import IncrelutionOptions, LogicStyle
+from .Options import IncrelutionOptions, LogicStyle, IncludePassiveJobs
 from .Rules import set_increlution_rules, set_increlution_completion
 from .info_jobs import jobs
 from .info_constructions import constructions
@@ -100,18 +100,31 @@ class IncrelutionWorld(World):
             self.multiworld.push_precollected(self.create_item("Progressive Progression Construction"))
             self.itempool.remove("Progressive Progression Construction")
             
-        perk_names = ["Perk: Generation exp. req.", "Perk: Instinct exp. req.", "Perk: Base decay", "Perk: Decay growth/min", "Perk: Max health gain",
-              "Perk: Food cooldown", "Perk: Food value", "Perk: Combat shield", "Perk: Completion damage", "Perk: Passive jobs"]
+        perk_names = [
+                        "Perk: Generation exp. req.", 
+                        "Perk: Instinct exp. req.", 
+                        "Perk: Base decay", 
+                        "Perk: Decay growth/min", 
+                        "Perk: Max health gain",
+                        "Perk: Food cooldown", 
+                        "Perk: Food value", 
+                        "Perk: Combat shield", 
+                        "Perk: Completion damage"
+                      ]
+        
+        if self.options.include_passive_jobs == IncludePassiveJobs.option_yes:
+            perk_names.append("Perk: Passive jobs")
         
         for i in range(self.options.perks_to_start_with.value):
             for p in perk_names:
-                self.multiworld.push_precollected(self.create_item(p))
-                
-        for i in range(max(self.options.perks_in_itempool.value * 10, self.number_of_locations - len(self.itempool) - 1)):
-            self.itempool.append(perk_names[i%10])
+                self.multiworld.push_precollected(self.create_item(p))    
+        
+        for i in range(min(self.options.perks_in_itempool.value * len(perk_names), self.number_of_locations - len(self.itempool) - 1)):
+            self.itempool.append(perk_names[i % len(perk_names)])   
             
         if self.number_of_locations - len(self.itempool) - 1 > 0:
             self.itempool += ["Filler"] * (self.number_of_locations - len(self.itempool) - 1)
+            
         # for i in range(10):
         #     print(f"if(item == '{perk_names[i]}'){{game[a0_0x3f84('0x101')]['perks'][{i}]['mantissa'] = counts[item];logtext += 'Received {perk_names[i]}\\n'}}")
         

@@ -53,6 +53,16 @@ class PerksToStartWith(Range):
     range_end = 100
     default = 1
     
+class IncludePassiveJobs(Choice):
+    """
+    Whether the perk Passive Jobs is given out in the above options.
+    """
+
+    display_name = "Include passive jobs"
+    option_yes = 1
+    option_no = 2
+    default = 1
+    
 
 @dataclass
 class IncrelutionOptions(PerGameCommonOptions):
@@ -60,4 +70,5 @@ class IncrelutionOptions(PerGameCommonOptions):
     logic_style: LogicStyle
     perks_in_itempool: PerksInItempool
     perks_to_start_with: PerksToStartWith
+    include_passive_jobs: IncludePassiveJobs
     
