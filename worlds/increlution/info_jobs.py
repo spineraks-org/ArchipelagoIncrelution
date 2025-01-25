@@ -1,5 +1,5 @@
 jobs = [
-    {"name": "Gather berries", "id_in_game": 0, "chapter": 1.1, "skill": "Farming"},
+{"name": "Gather berries", "id_in_game": 0, "chapter": 1.1, "skill": "Farming"},
 {"name": "Cut wood", "id_in_game": 1, "chapter": 1.1, "skill": "Woodcutting"},
 {"name": "Catch fish", "id_in_game": 2, "chapter": 1.1, "skill": "Fishing"},
 {"name": "Cook fish", "id_in_game": 3, "chapter": 1.1, "skill": "Cooking"},

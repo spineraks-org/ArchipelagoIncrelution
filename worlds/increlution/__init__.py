@@ -183,6 +183,14 @@ class IncrelutionWorld(World):
         item = IncrelutionItem(name, item_data.classification, item_data.code, self.player)
         return item
     
+    def fill_slot_data(self):
+        """
+        make slot data, which consists of yachtdice_data, options, and some other variables.
+        """
+        slot_data = {}  # combine the two
+        slot_data["perk_multiplier"] = self.options.perk_multiplier.value
+        return slot_data
+    
     # def generate_output(self, output_directory: str) -> None:
     #     counts = {}
     #     for job_name, job in jobs.items():

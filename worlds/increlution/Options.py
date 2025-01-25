@@ -28,6 +28,17 @@ class LogicStyle(Choice):
     option_full = 3
     default = 3
     
+class PerkMultiplier(Range):
+    """
+    You can place NG+ perks in the itempool.
+    Everytime you receive one, you won't just receive one, but you'll receive the amount you put here.
+    """
+
+    display_name = "Perk multiplier value"
+    range_start = 0
+    range_end = 100
+    default = 10
+    
 class PerksInItempool(Range):
     """
     If there are locations left to put items in, you can place NG+ perks in there.
@@ -38,7 +49,7 @@ class PerksInItempool(Range):
 
     display_name = "Number of perks per type in itempool"
     range_start = 0
-    range_end = 10
+    range_end = 100
     default = 2
     
 class PerksToStartWith(Range):
@@ -50,8 +61,8 @@ class PerksToStartWith(Range):
 
     display_name = "Number of perks per type to start with"
     range_start = 0
-    range_end = 100
-    default = 1
+    range_end = 1000
+    default = 0
     
 class IncludePassiveJobs(Choice):
     """
@@ -68,6 +79,7 @@ class IncludePassiveJobs(Choice):
 class IncrelutionOptions(PerGameCommonOptions):
     last_chapter: LastChapter
     logic_style: LogicStyle
+    perk_multiplier: PerkMultiplier
     perks_in_itempool: PerksInItempool
     perks_to_start_with: PerksToStartWith
     include_passive_jobs: IncludePassiveJobs
